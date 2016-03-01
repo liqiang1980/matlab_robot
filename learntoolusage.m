@@ -8,7 +8,7 @@ close all;
 kuka_robot = loadrobot('kukalwr');
 % %     visualization of kuka_lwr at the initialized pose
 Q = rand(1,7);
-kuka_robot.plot(Q,'workspace', [-2 2 -2 2 -2 2]);
+kuka_robot.plot(Q,'workspace', [-3 3 -3 3 -3 3]);
 %model the tactool frame
 T_init = kuka_robot.fkine(Q);
 % kuka_robot.jacob0(Q)

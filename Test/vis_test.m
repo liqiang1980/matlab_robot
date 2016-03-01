@@ -1,5 +1,5 @@
 close all;
-cd ../myws
+cd /home/qiang/SWLib/rvctools/matlab_robot
 %load robot model
 kuka_robot = loadrobot('kukalwr');
 % %     visualization of kuka_lwr at the initialized pose
@@ -23,7 +23,7 @@ for i =1:1:20
     T_tool_cur = T_eff_cur*tool_transform;
     trplot(T_eff_cur, 'frame', 'A');
     trplot(T_tool_cur, 'frame', 'B','color','r');
-    p_t_dot_local = 0.05*rand(3,1);
+    p_t_dot_local = 0.005*rand(3,1);
     p_t_dot_local(3) = 0;
     p_e_dot_local = T_eff_cur(1:3,1:3)'*T_tool_cur(1:3,1:3)*p_t_dot_local;
     p_e_dot = T_eff_cur(1:3,1:3)*p_e_dot_local;
@@ -35,8 +35,8 @@ for i =1:1:20
     P2 = T_tool_cur(1:3,4)';
     
     if(i~=1)
-        deltap = P1 - P1_last;
-        T_eff_cur(1:3,1:3)'*deltap'
+        deltap = P2 - P2_last;
+        T_tool_cur(1:3,1:3)'*deltap'
     end
     
     % Their vertial concatenation is what you want
@@ -49,7 +49,7 @@ for i =1:1:20
     Q= Q+q_dot';
     
     %only for testing whether moving is one the surface
-    P1_last = P1;
-    pause(2);
+    P2_last = P2;
+    pause(1);
 end
 
