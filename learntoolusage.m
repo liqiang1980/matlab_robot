@@ -8,31 +8,17 @@ close all;
 kuka_robot = loadrobot('kukalwr');
 % %     visualization of kuka_lwr at the initialized pose
 Q = rand(1,7);
-kuka_robot.plot(Q,'workspace', [-3 3 -3 3 -3 3]);
 %model the tactool frame
 T_init = kuka_robot.fkine(Q);
-% kuka_robot.jacob0(Q)
-hold on;
-trplot(T_init, 'frame', 'A');
-hold on;
 link_value = rand(3,1);
 rot_value = [0.2,0.5,0.3];
-% used for test the rotation relation of toolbox
-% T1 = troty(0.2)* T_init;
-% trplot(T1, 'frame', 'B','color','r');
-% T2 = trotx(0.2)*T1;
-% trplot(T2, 'frame', 'C','color','g');
 tool_rotate = trotz(rot_value(3))*troty(rot_value(2))*trotx(rot_value(1));
 tool_translate = transl(link_value);
 tool_transform = tool_rotate * tool_translate ;
 T_eff_start = T_init*tool_transform;
-trplot(T_eff_start, 'frame', 'B','color','r');
-hold on;
 virtual_angle = 6;
 rot_tm = rpy2tr(0,0,virtual_angle);
 T_eff_start_virtual = T_eff_start*rot_tm;
-trplot(T_eff_start_virtual, 'frame', 'V','color','g');
-hold on;
 
 virtual_x = 6;
 virtual_y = 6;
@@ -56,8 +42,8 @@ est_trans_dot = zeros(3,1);
 P_bar = zeros(3);
 L_n = zeros(3);
 L_n_dot = zeros(3);
-beta_n = 0.95;
-gamma_n = 0.5;
+beta_n = 0.99;
+gamma_n = 300;
 n_hat = zeros(3,1);
 n_hat_dot = zeros(3,1);
 
@@ -87,36 +73,56 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %exploration action in order to estimate the normal direction
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-sample_num = 300;
-disp('esimated normal dir');
+sample_num = 1500;
 n_hat = T_eff_start_noise(1:3,3)
-disp('real normal dir');
 T_eff_start(1:3,3)
+
+
 for j =1:1:sample_num
-    %desired linear velocity in the tool end-effector surface
-    T_robot_eff_end_cur = T_init;
+    %compute the current robot and tool configure
+    T_robot_eff_end_cur = kuka_robot.fkine(Q);
     T_tool_eff_end_cur = T_robot_eff_end_cur*tool_transform;
+%     trplot(T_eff_cur, 'frame', 'A');
+%     trplot(T_tool_cur, 'frame', 'B','color','r');
     %desired velocity in the local tool end-effector frame
-    p_e_dot_local = rand(3,1);
+    p_e_dot_local = 0.005*rand(3,1);
     p_e_dot_local(3) = 0;
     p_e_dot = T_tool_eff_end_cur(1:3,1:3) * p_e_dot_local;
-%     % Your two points
-%     P1 = T_init(1:3,4)';
-%     P2 = T_tool_eff_end_cur(1:3,4)';
-%     % Their vertial concatenation is what you want
-%     pts = [P1; P2]; 
-%     % Alternatively, you could use plot3:
-%     plot3(pts(:,1), pts(:,2), pts(:,3))
+    %from the desired linear velocity computing the joint angle rate
+    Jac = kuka_robot.jacob0(Q);
+    q_dot = pinv(Jac)*[p_e_dot;0;0;0];
+    % draw tool with line between two 3d points
+    P1 = T_eff_cur(1:3,4)';
+    P2 = T_tool_cur(1:3,4)';
+    pts = [P1; P2];
+    plot3(pts(:,1), pts(:,2), pts(:,3),'LineWidth',5);
+%     kuka_robot.plot(Q,'workspace', [-3 3 -3 3 -3 3]);
+    hold on;
     
     P_bar = eye(3)-n_hat*n_hat';
     n_hat_dot = -1*gamma_n*P_bar*L_n*n_hat;
     L_n_dot = -beta_n*L_n+(1/(1+norm(p_e_dot)^2))*p_e_dot*p_e_dot';
     n_hat = n_hat+n_hat_dot;
     L_n = L_n + L_n_dot;
-%     if(mod(sample_num,10) == 0)
+    if(mod(sample_num,10) == 0)
 %         disp('updated normal dir');
 %         n_hat
-%     end
+        %estimated normal direction
+        est_nv_start = T_tool_cur(1:3,4)';
+        est_nv_end = est_nv_start+n_hat';
+        pts = [est_nv_start; est_nv_end];
+        plot3(pts(:,1), pts(:,2), pts(:,3),'b-');
+        hold on;
+        %estimated normal direction
+        nv_start = T_tool_cur(1:3,4)';
+        nv_end = T_tool_cur(1:3,3)';
+        pts = [nv_start; nv_end];
+        plot3(pts(:,1), pts(:,2), pts(:,3),'r-');
+        hold on;
+        
+    end
+    %update joint angle
+    Q= Q+q_dot';
 end
 disp('updated normal dir');
         n_hat
