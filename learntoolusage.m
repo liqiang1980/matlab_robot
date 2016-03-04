@@ -47,12 +47,15 @@ T_tool_end_eff_init_noise(1:3,3)
 cx = -0.04 + 0.08*rand; %initialized contact point in the local x
 cy = -0.04 + 0.08*rand; %initialized contact point in the local y
 c = T_tool_end_eff_init*[cx,cy,0,1]';
-sphere_r = 0.002;
+sphere_r = 0.005;
 drawsphere(c(1:3),sphere_r);
 
+%this is a flag to improve the visualization quality 0 is only geometry, 1
+%with robot
+Flag_userobot = 0;
 %estimate normal direction using the initialized nv guess from the
 %approaching trajectory
-n_hat = est_nv_tac(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise)
+[n_hat dis_set] = est_nv_tac(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot)
 
 % estimate rotate angle from the virtual tool frame to real tool frame
 rotate_angle = est_rotate(virtual_angle);

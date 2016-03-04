@@ -24,7 +24,7 @@ function new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_e
 % direction
 % (3) new tool frame center is the 1st step result translated by 2nd step 
 % desired velocity in the local noised tool end-effector frame
-noised_tool_lv_dot_local = 0.01*randn(3,1);
+noised_tool_lv_dot_local = 0.002*randn(3,1);
 noised_tool_lv_dot_local(3) = 0;
 noised_tool_lv_dot_global = T_tool_end_eff_init_noise(1:3,1:3) * noised_tool_lv_dot_local;
 % after the 1st step, the tool frame origin is

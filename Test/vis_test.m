@@ -1,5 +1,5 @@
 close all;
-cd /home/qiang/SWLib/rvctools/matlab_robot
+cd ..
 %load robot model
 kuka_robot = loadrobot('kukalwr');
 % %     visualization of kuka_lwr at the initialized pose
@@ -21,13 +21,13 @@ for i =1:1:20
     %compute the current robot and tool configure
     T_eff_cur = kuka_robot.fkine(Q);
     T_tool_cur = T_eff_cur*tool_transform;
-    trplot(T_eff_cur, 'frame', 'A');
-    trplot(T_tool_cur, 'frame', 'B','color','r');
+%     trplot(T_eff_cur, 'frame', 'A');
+%     trplot(T_tool_cur, 'frame', 'B','color','r');
     p_t_dot_local = 0.005*rand(3,1);
     p_t_dot_local(3) = 0;
     p_e_dot_local = T_eff_cur(1:3,1:3)'*T_tool_cur(1:3,1:3)*p_t_dot_local;
     p_e_dot = T_eff_cur(1:3,1:3)*p_e_dot_local;
-    Jac = kuka_robot.jacob0(Q);
+    Jac = kuka_robot.jacobn(Q);
     q_dot = pinv(Jac)*[p_e_dot;0;0;0];
     
     % two points
