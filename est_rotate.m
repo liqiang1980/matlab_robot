@@ -11,7 +11,6 @@
 %is known which is Rv_r*[-1,0,0]; where Rv_r is transformatrix from virtual
 %frame to the real tactile sensor frame.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% sliding exploration in order to estimate the rotation ang
 % sponsered by DFG spp-1527: autonmous learning
 % author: Qiang Li, Bielefeld
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

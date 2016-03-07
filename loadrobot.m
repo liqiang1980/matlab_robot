@@ -1,3 +1,16 @@
+% load robot kinematics model
+%
+% kuka_robot = loadrobot(name)
+%
+% name: robot name
+% kuka_robot: instantiated robot kinematics model
+% exploration
+% See also 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sponsered by DFG spp-1527: autonmous learning
+% author: Qiang Li, Bielefeld
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function kuka_robot = loadrobot(name)
 switch name
   case char('kukalwr')

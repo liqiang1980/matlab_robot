@@ -7,15 +7,16 @@
 % T_tool_end_eff_cur: current tool end-effector homogeneous matrix
 % new_tool_end_eff_frame: updated tool frame after one step sliding
 % exploration
+% em: exploring mode. 1, sliding along x axis; 2, sliding along y axis; 3.
+% random exploring
 % See also 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% exploration action in order to estimate the normal direction
 % sponsered by DFG spp-1527: autonomous learning
 % author: Qiang Li, Bielefeld
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_init_noise)
+function new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_init_noise,em)
 % analog the robot interactive action while there is a normal direciton
 % estimation error. The whole analog process is compose three part
 % (1) real tool frame randomly moving(exploring) along the estimated tool frame
@@ -24,8 +25,22 @@ function new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_e
 % direction
 % (3) new tool frame center is the 1st step result translated by 2nd step 
 % desired velocity in the local noised tool end-effector frame
-noised_tool_lv_dot_local = 0.002*randn(3,1);
-noised_tool_lv_dot_local(3) = 0;
+switch em
+    case 1
+        noised_tool_lv_dot_local(0) = 0.001;
+        noised_tool_lv_dot_local(1) = 0;
+        noised_tool_lv_dot_local(3) = 0;
+    case 2
+        noised_tool_lv_dot_local(0) = 0;
+        noised_tool_lv_dot_local(1) = 0.001;
+        noised_tool_lv_dot_local(3) = 0;
+    case 3
+        noised_tool_lv_dot_local = 0.002*randn(3,1);
+        noised_tool_lv_dot_local(3) = 0;
+    otherwise
+        disp('exploring mode 1:along x; 2: along y; 3:random, are you planning add a new mode')
+end
+
 noised_tool_lv_dot_global = T_tool_end_eff_init_noise(1:3,1:3) * noised_tool_lv_dot_local;
 % after the 1st step, the tool frame origin is
 tool_1st_end_eff = eye(4);

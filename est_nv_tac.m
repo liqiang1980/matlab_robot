@@ -10,16 +10,15 @@
 % tool_transform: the real tool transform homogeneous matrix
 % T_tool_end_eff_init_noise: assumption noised homogeneous matrix of tool frame.
 % Flag_userobot: flag whether use robot or only geometry compuation.
-% n_hat[right side]: intialized normal direction, array 3*1
+% n_hat[right side]: intialized normal direction, vector 3*1
 % dis_set is the distance set to store neighbour frame update
 % See also 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% exploration action in order to estimate the normal direction
 % sponsered by DFG spp-1527: autonmous learning
 % author: Qiang Li, Bielefeld
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [n_hat dis_set]= est_nv_tac(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot)
+function [n_hat, dis_set, new_tool_end_eff_frame]= est_nv_tac(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot)
 %initialize the parameters
 P_bar = zeros(3);
 L_n = zeros(3);
@@ -47,7 +46,8 @@ for j =1:1:sample_num
     color = [0.3,0.6,0.8];
     drawtactool(T_robot_end_eff_cur,T_tool_end_eff_cur,myrmexsize,color) ;
     %update tool end-effector frame every control step
-    new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_init_noise);
+    em = 3%random exploring in the tangent surface;
+    new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_init_noise,em);
     %because the numerical error of inverse kinematics methd[new_tool_end_eff_frame is not
     %equal to the T_tool_end_eff_cur(next control step)], the distance
     %of neighbour update is computed and stored. I can be sure that
