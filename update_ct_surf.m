@@ -27,18 +27,20 @@ function new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_e
 % desired velocity in the local noised tool end-effector frame
 switch em
     case 1
-        noised_tool_lv_dot_local(0) = 0.001;
-        noised_tool_lv_dot_local(1) = 0;
+        noised_tool_lv_dot_local = zeros(3,1);
+        noised_tool_lv_dot_local(1) = 0.001;
+        noised_tool_lv_dot_local(2) = 0;
         noised_tool_lv_dot_local(3) = 0;
     case 2
-        noised_tool_lv_dot_local(0) = 0;
-        noised_tool_lv_dot_local(1) = 0.001;
+        noised_tool_lv_dot_local = zeros(3,1);
+        noised_tool_lv_dot_local(1) = 0;
+        noised_tool_lv_dot_local(2) = 0.001;
         noised_tool_lv_dot_local(3) = 0;
     case 3
         noised_tool_lv_dot_local = 0.002*randn(3,1);
         noised_tool_lv_dot_local(3) = 0;
     otherwise
-        disp('exploring mode 1:along x; 2: along y; 3:random, are you planning add a new mode')
+        disp('exploring mode 1:along x; 2: along y; 3:random, are you planning add a new mode');
 end
 
 noised_tool_lv_dot_global = T_tool_end_eff_init_noise(1:3,1:3) * noised_tool_lv_dot_local;

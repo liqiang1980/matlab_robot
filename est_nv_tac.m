@@ -44,9 +44,9 @@ for j =1:1:sample_num
     %draw tool: bar+square
     myrmexsize = 0.08;
     color = [0.3,0.6,0.8];
-    drawtactool(T_robot_end_eff_cur,T_tool_end_eff_cur,myrmexsize,color) ;
+%     drawtactool(T_robot_end_eff_cur,T_tool_end_eff_cur,myrmexsize,color) ;
     %update tool end-effector frame every control step
-    em = 3%random exploring in the tangent surface;
+    em = 3;%random exploring in the tangent surface;
     new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_init_noise,em);
     %because the numerical error of inverse kinematics methd[new_tool_end_eff_frame is not
     %equal to the T_tool_end_eff_cur(next control step)], the distance
