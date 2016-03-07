@@ -66,6 +66,6 @@ disp('rotation angle along z is');
 rotate_angle
 
 %estimate translation from robot end-effector to tool end-effector
-est_trans = est_translation(kuka_robot,Q,tool_transform,tool_rotate,link_value);
+est_trans = est_translation_tac(kuka_robot,Q,tool_transform,tool_rotate,link_value);
 
 

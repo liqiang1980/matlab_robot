@@ -45,8 +45,8 @@ for j =1:1:sample_num
     %get the contact position in tactile sensor on the tool end-effector
     [cx,cy] = get_tac_position(T_tool_end_eff_cur,tactile_ct);
     %add gaussian noise and collect 2d contact position
-    ct_set(j,1) = cx+0.00*randn;
-    ct_set(j,2) = cy+0.00*randn;
+    ct_set(j,1) = cx+0.001*randn;
+    ct_set(j,2) = cy+0.001*randn;
     
     %visualization
     virtual_visualization(1:3,1:3) = T_tool_end_eff_1stupdate;
@@ -57,19 +57,19 @@ end
 
 %using the regression method to estimate the slop and intercept in the 2d
 %case
-[k,b,deltay,deltax,atan2_k] = regression_2d(ct_set);
+[k,b,deltay,deltax,atan2_k,k2] = regression_2d(ct_set);
 
 if(sign(atan2_k) == 1 )
     if((deltay>0)&&(deltax>0))
-        gama = k+pi;
+        gama = k2+pi;
     else
-        gama = k;
+        gama = k2;
     end
 else
     if((deltay>0)&&(deltax<0))
-        gama = k+pi;
+        gama = k2+pi;
     else
-        gama = k;
+        gama = k2;
     end
 end
 rotate_angle = gama;
