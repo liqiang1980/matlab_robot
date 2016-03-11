@@ -1,6 +1,6 @@
 % Update contact surface
 %
-% new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_init_noise) is function to 
+% new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_cur_noise) is function to 
 % update the tactile tool frame because the noised initialized frame while
 % the sliding exploration happens.
 %
@@ -16,7 +16,7 @@
 % author: Qiang Li, Bielefeld
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_init_noise,em)
+function [new_tool_end_eff_frame] = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_cur_noise,em,j)
 % analog the robot interactive action while there is a normal direciton
 % estimation error. The whole analog process is compose three part
 % (1) real tool frame randomly moving(exploring) along the estimated tool frame
@@ -39,11 +39,18 @@ switch em
     case 3
         noised_tool_lv_dot_local = 0.002*randn(3,1);
         noised_tool_lv_dot_local(3) = 0;
+    case 4
+        noised_tool_lv_dot_local = zeros(3,1);
+        noised_tool_lv_dot_local(1) = 0.0002*sin(0.02*j);
+        noised_tool_lv_dot_local(2) = 0.0002*cos(0.02*j);
+        noised_tool_lv_dot_local(3) = 0;
     otherwise
         disp('exploring mode 1:along x; 2: along y; 3:random, are you planning add a new mode');
 end
 
-noised_tool_lv_dot_global = T_tool_end_eff_init_noise(1:3,1:3) * noised_tool_lv_dot_local;
+
+
+noised_tool_lv_dot_global = T_tool_end_eff_cur_noise(1:3,1:3) * noised_tool_lv_dot_local;
 % after the 1st step, the tool frame origin is
 tool_1st_end_eff = eye(4);
 tool_1st_end_eff(1:3,1:3) = T_tool_end_eff_cur(1:3,1:3);
@@ -62,11 +69,11 @@ tool_1st_end_eff(1:3,4) = T_tool_end_eff_cur(1:3,4) + noised_tool_lv_dot_global;
 % frame is zero. With this relation, the "t" can be computed.
 tool_inv = inv(tool_1st_end_eff);
 t = -1 * tool_inv(3,1:4)* T_tool_end_eff_cur(:,4)/...
-    (tool_inv(3,1:4)*[T_tool_end_eff_init_noise(1:3,3);0]);
+    (tool_inv(3,1:4)*[T_tool_end_eff_cur_noise(1:3,3);0]);
 
 %the result from 1st step should be translated by t in the estimated tool
 %frame, the final tool frame is computed
-t_global = T_tool_end_eff_init_noise(1:3,1:3)*[0;0;-t];
+t_global = T_tool_end_eff_cur_noise(1:3,1:3)*[0;0;-t];
 
 new_tool_end_eff_frame = tool_1st_end_eff;
 new_tool_end_eff_frame(1:3,4) =  tool_1st_end_eff(1:3,4) + t_global;

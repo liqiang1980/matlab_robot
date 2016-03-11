@@ -35,9 +35,9 @@ virtual_angle = 6;
 rot_tm = rpy2tr(0,0,virtual_angle,'deg');
 T_tool_end_eff_init_virtual = T_tool_end_eff_init*rot_tm;
 %analog the noised tactool frame
-virtual_x = 26;
-virtual_y = 26;
-virtual_z = 26;
+virtual_x = -90+180*rand;
+virtual_y = -90+180*rand;
+virtual_z = -90+180*rand;
 rot_tm = rpy2tr(virtual_x,virtual_y,virtual_z,'deg');
 T_tool_end_eff_init_noise = T_tool_end_eff_init*rot_tm;
 % trplot(T_tool_end_eff_init_noise, 'frame', 'N');
@@ -45,8 +45,10 @@ disp('noised n_hat');
 T_tool_end_eff_init_noise(1:3,3)
 
 %draw contact ball
-cx = -0.04 + 0.08*rand; %initialized contact point in the local x
-cy = -0.04 + 0.08*rand; %initialized contact point in the local y
+% cx = -0.04 + 0.08*rand; %initialized contact point in the local x
+% cy = -0.04 + 0.08*rand; %initialized contact point in the local y
+cx = 0; %initialized contact point in the local x
+cy = 0; %initialized contact point in the local y
 %compute the real contact position in 3D.
 tactile_ct = T_tool_end_eff_init*[cx,cy,0,1]';
 sphere_r = 0.005;

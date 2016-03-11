@@ -37,7 +37,7 @@ for j =1:1:sample_num
     end
     %update tool end-effector frame every control step
     em = 1;%exploring along x axis
-    new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_1stupdate,em);
+    new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_1stupdate,em,j);
     %draw tool: bar+square
     myrmexsize = 0.08;
     color = [0.3,0.6,0.8];

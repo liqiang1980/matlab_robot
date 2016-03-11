@@ -28,7 +28,7 @@ gamma_n = 0.5;
 n_hat = T_tool_end_eff_init_noise(1:3,3);
 T_tool_end_eff_old = eye(4);
 n_hat_dot = zeros(3,1);
-sample_num = 100;
+sample_num = 350;
 %define index for the stored the normal direction
 set_index = 0;
 
@@ -46,8 +46,13 @@ for j =1:1:sample_num
     color = [0.3,0.6,0.8];
 %     drawtactool(T_robot_end_eff_cur,T_tool_end_eff_cur,myrmexsize,color) ;
     %update tool end-effector frame every control step
-    em = 3;%random exploring in the tangent surface;
-    new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_init_noise,em);
+    em = 4;%circle motion in the tangent surface;
+    if(j==1)
+        T_tool_end_eff_cur_noise = T_tool_end_eff_init_noise;
+    else
+        T_tool_end_eff_cur_noise = new_T_tool_end_eff_noise;
+    end
+    [new_tool_end_eff_frame] = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_cur_noise,em,j);
     %because the numerical error of inverse kinematics methd[new_tool_end_eff_frame is not
     %equal to the T_tool_end_eff_cur(next control step)], the distance
     %of neighbour update is computed and stored. I can be sure that
@@ -71,13 +76,17 @@ for j =1:1:sample_num
 %     kuka_robot.plot(Q,'workspace',[-3, 3 -3, 3 -3, 3]);
     
     %algorithm to estimate the normal direction
-    tool_lv_dot_global = 200*tool_lv_dot_global;
+    tool_lv_dot_global = 2000*tool_lv_dot_global;
     P_bar = eye(3)-n_hat*n_hat';
     n_hat_dot = -1*gamma_n*P_bar*L_n*n_hat;
     L_n_dot = -beta_n*L_n+(1/(1+norm(tool_lv_dot_global)^2))*tool_lv_dot_global*tool_lv_dot_global';
     n_hat = n_hat+n_hat_dot;
     n_hat = n_hat/norm(n_hat);
     L_n = L_n + L_n_dot;
+    
+    %update the new noised sensor frame
+    new_T_tool_end_eff_noise = rotate_generate(T_tool_end_eff_cur_noise,n_hat);
+    
     %visualization of the normal direction approaching from the initial
     %guess to the real direction
     if(mod(j,10) == 0)
@@ -98,6 +107,10 @@ for j =1:1:sample_num
         pts = [nv_start; nv_end];
 %         plot3(pts(:,1), pts(:,2), pts(:,3),'m-');
 %         hold on;  
+        %draw tool: bar+square
+        myrmexsize = 0.08;
+        color = [0.3,0.6,0.8];
+        drawsquare(T_tool_end_eff_cur,myrmexsize,color);
     end
     %update the robot joint angle
     T_tool_end_eff_old = T_tool_end_eff_cur;
