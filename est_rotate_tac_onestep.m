@@ -42,7 +42,12 @@ for j =1:1:sample_num
 %     drawtactool(T_robot_end_eff_cur,T_tool_end_eff_cur,myrmexsize,color) ;
     %update tool end-effector frame every control step
     em = 3;%random exploring in the tangent surface;
-    new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_init_noise,em);
+    if(j==1)
+        T_tool_end_eff_cur_noise = T_tool_end_eff_init_noise;
+    else
+        T_tool_end_eff_cur_noise = new_T_tool_end_eff_noise;
+    end
+    [new_tool_end_eff_frame] = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_cur_noise,em,j);
     %because the numerical error of inverse kinematics methd[new_tool_end_eff_frame is not
     %equal to the T_tool_end_eff_cur(next control step)], the distance
     %of neighbour update is computed and stored. I can be sure that
@@ -74,9 +79,62 @@ for j =1:1:sample_num
     n_hat = n_hat/norm(n_hat);
     L_n = L_n + L_n_dot;
     
+    %update the new noised sensor frame
+    new_T_tool_end_eff_noise = rotate_generate(T_tool_end_eff_cur_noise,n_hat);
     
+    %update the rotation around the current estimated z axis
+    T_tool_end_eff_1stupdate = genOthoBasis(n_hat);
+virtual_visualization = eye(4);
+transf = eye(4);
+transf(1:3,1:3) = tool_1st_end_eff_frame(1:3,1:3)'*T_tool_end_eff_1stupdate;
+disp('RPY angle is ');
+tr2rpy(transf)
+sample_num = 50;
+for j =1:1:sample_num
+    if(j==1)
+        T_tool_end_eff_cur = tool_1st_end_eff_frame;
+    else
+        T_tool_end_eff_cur = new_tool_end_eff_frame;
+    end
+    %update tool end-effector frame every control step
+    em = 1;%exploring along x axis
+    new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_1stupdate,em,j);
+    %draw tool: bar+square
+    myrmexsize = 0.08;
+    color = [0.3,0.6,0.8];
+    drawsquare(new_tool_end_eff_frame,myrmexsize,color);
+    %get the contact position in tactile sensor on the tool end-effector
+    [cx,cy] = get_tac_position(T_tool_end_eff_cur,tactile_ct);
+    %add gaussian noise and collect 2d contact position
+    ct_set(j,1) = cx+0.001*randn;
+    ct_set(j,2) = cy+0.001*randn;
     
-    
+    %visualization
+    virtual_visualization(1:3,1:3) = T_tool_end_eff_1stupdate;
+    virtual_visualization(1:3,4) = T_tool_end_eff_cur(1:3,4);
+    trplot(virtual_visualization, 'frame', 'V','color','r','length',0.1);
+    trplot(T_tool_end_eff_cur, 'frame', 'R','length',0.1);
+end
+
+%using the regression method to estimate the slop and intercept in the 2d
+%case
+[k,b,deltay,deltax,atan2_k,k2] = regression_2d(ct_set);
+
+if(sign(atan2_k) == 1 )
+    if((deltay>0)&&(deltax>0))
+        gama = k2+pi;
+    else
+        gama = k2;
+    end
+else
+    if((deltay>0)&&(deltax<0))
+        gama = k2+pi;
+    else
+        gama = k2;
+    end
+end
+rotate_angle = gama;
+        
     %visualization of the normal direction approaching from the initial
     %guess to the real direction
     if(mod(j,10) == 0)
