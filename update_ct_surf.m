@@ -16,7 +16,7 @@
 % author: Qiang Li, Bielefeld
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [new_tool_end_eff_frame] = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_cur_noise,em,j)
+function [new_tool_end_eff_frame noised_tool_lv_dot_local] = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_cur_noise,em,j)
 % analog the robot interactive action while there is a normal direciton
 % estimation error. The whole analog process is compose three part
 % (1) real tool frame randomly moving(exploring) along the estimated tool frame
@@ -44,11 +44,11 @@ switch em
         noised_tool_lv_dot_local(1) = 0.0002*sin(0.02*j);
         noised_tool_lv_dot_local(2) = 0.0002*cos(0.02*j);
         noised_tool_lv_dot_local(3) = 0;
+    case 5
+        noised_tool_lv_dot_local = generate_square_shape(j,0.01);
     otherwise
-        disp('exploring mode 1:along x; 2: along y; 3:random, are you planning add a new mode');
+        disp('exploring mode 1:along x; 2: along y; 3:random; 4:circle, 5 squareshape are you planning add a new mode');
 end
-
-
 
 noised_tool_lv_dot_global = T_tool_end_eff_cur_noise(1:3,1:3) * noised_tool_lv_dot_local;
 % after the 1st step, the tool frame origin is

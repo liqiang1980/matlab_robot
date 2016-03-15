@@ -15,7 +15,7 @@
 % sponsered by DFG spp-1527: autonmous learning
 % author: Qiang Li, Bielefeld
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function hm = est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot)
+function n_hat = est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct)
 %initialize the parameters
 P_bar = zeros(3);
 L_n = zeros(3);
@@ -25,10 +25,14 @@ gamma_n = 0.5;
 n_hat = T_tool_end_eff_init_noise(1:3,3);
 T_tool_end_eff_old = eye(4);
 n_hat_dot = zeros(3,1);
-sample_num = 100;
+sample_num = 80;
 %define index for the stored the normal direction
 set_index = 0;
+old_ctc = zeros(1,2);
+exploration_scale = 0.01;
+
 for j =1:1:sample_num
+    
     %compute the current robot and tool configure
     T_robot_end_eff_cur = kuka_robot.fkine(Q);
     if((Flag_userobot == 1)||(j==1))
@@ -41,21 +45,26 @@ for j =1:1:sample_num
     color = [0.3,0.6,0.8];
 %     drawtactool(T_robot_end_eff_cur,T_tool_end_eff_cur,myrmexsize,color) ;
     %update tool end-effector frame every control step
-    em = 3;%random exploring in the tangent surface;
+    em = 5;%circle motion in the tangent surface;
     if(j==1)
         T_tool_end_eff_cur_noise = T_tool_end_eff_init_noise;
     else
         T_tool_end_eff_cur_noise = new_T_tool_end_eff_noise;
     end
-    [new_tool_end_eff_frame] = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_cur_noise,em,j);
+    [new_tool_end_eff_frame noised_tool_lv_dot_local] = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_cur_noise,em,j);
+    dis_set(j) = dot(T_tool_end_eff_cur(1:3,3),T_tool_end_eff_cur_noise(1:3,3));
+    dis_set2(j) = dot(T_tool_end_eff_cur(1:3,3),n_hat);
+    nv_set(:,j) = T_tool_end_eff_cur_noise(1:3,3);
+    tan1(:,j) = T_tool_end_eff_cur_noise(1:3,1);
+    tan2(:,j) = T_tool_end_eff_cur_noise(1:3,2);
     %because the numerical error of inverse kinematics methd[new_tool_end_eff_frame is not
     %equal to the T_tool_end_eff_cur(next control step)], the distance
     %of neighbour update is computed and stored. I can be sure that
     %update_ct_surface is good because if we replace T_tool_end_eff_old
     %with new_tool_end_eff_frame, then dis = 0.(dis is the distance along 
     %the real normal direction)
-    dis = inv(T_tool_end_eff_cur)*(T_tool_end_eff_old(:,4) - T_tool_end_eff_cur(:,4));
-    dis_set(j) = dis(3);
+%     dis = inv(T_tool_end_eff_cur)*(T_tool_end_eff_old(:,4) - T_tool_end_eff_cur(:,4));
+%     dis_set(j) = dis(3);
     %estimate the linear velocity of tool, which is also the linear
     %velocity of robot end-effector, and also contact point linear velocity
     tool_lv_dot_global = new_tool_end_eff_frame(1:3,4) - T_tool_end_eff_cur(1:3,4);
@@ -71,7 +80,7 @@ for j =1:1:sample_num
 %     kuka_robot.plot(Q,'workspace',[-3, 3 -3, 3 -3, 3]);
     
     %algorithm to estimate the normal direction
-    tool_lv_dot_global = 200*tool_lv_dot_global;
+    tool_lv_dot_global = 2000*tool_lv_dot_global;
     P_bar = eye(3)-n_hat*n_hat';
     n_hat_dot = -1*gamma_n*P_bar*L_n*n_hat;
     L_n_dot = -beta_n*L_n+(1/(1+norm(tool_lv_dot_global)^2))*tool_lv_dot_global*tool_lv_dot_global';
@@ -82,62 +91,33 @@ for j =1:1:sample_num
     %update the new noised sensor frame
     new_T_tool_end_eff_noise = rotate_generate(T_tool_end_eff_cur_noise,n_hat);
     
-    %update the rotation around the current estimated z axis
-    T_tool_end_eff_1stupdate = genOthoBasis(n_hat);
-virtual_visualization = eye(4);
-transf = eye(4);
-transf(1:3,1:3) = tool_1st_end_eff_frame(1:3,1:3)'*T_tool_end_eff_1stupdate;
-disp('RPY angle is ');
-tr2rpy(transf)
-sample_num = 50;
-for j =1:1:sample_num
-    if(j==1)
-        T_tool_end_eff_cur = tool_1st_end_eff_frame;
-    else
-        T_tool_end_eff_cur = new_tool_end_eff_frame;
+    % in oder to estimate the rotation matrix from virtual frame to the
+    % real frame, more data are needed instead of only start point and end
+    % point which is used for the normal direction estimation
+    sample_num = 10;
+    ct_R = zeros(sample_num,2);
+    ct_V = zeros(sample_num,2);
+    for k =1:1:sample_num
+        T_tool_intermedia_cur = eye(4);
+        T_tool_intermedia_cur(1:3,1:3) =  T_tool_end_eff_cur(1:3,1:3);
+        T_tool_intermedia_cur(1:3,4) = T_tool_end_eff_old(1:3,4) + k*(T_tool_end_eff_cur(1:3,4)-T_tool_end_eff_old(1:3,4))/sample_num;
+        %get the contact position in tactile sensor on the tool end-effector
+        [cx,cy] = get_tac_position(T_tool_intermedia_cur,tactile_ct);
+        %add gaussian noise and collect 2d contact position
+        ct_R(j,1) = cx+0.001*randn;
+        ct_R(j,2) = cy+0.001*randn;
+        ct_V(j,:) = gen_tra_virualframe(j,k,exploration_scale,sample_num);
     end
-    %update tool end-effector frame every control step
-    em = 1;%exploring along x axis
-    new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_1stupdate,em,j);
+    rotation_matrix_2d = est_rotatematrix(ct_V,ct_R);
     %draw tool: bar+square
     myrmexsize = 0.08;
     color = [0.3,0.6,0.8];
     drawsquare(new_tool_end_eff_frame,myrmexsize,color);
-    %get the contact position in tactile sensor on the tool end-effector
-    [cx,cy] = get_tac_position(T_tool_end_eff_cur,tactile_ct);
-    %add gaussian noise and collect 2d contact position
-    ct_set(j,1) = cx+0.001*randn;
-    ct_set(j,2) = cy+0.001*randn;
     
-    %visualization
-    virtual_visualization(1:3,1:3) = T_tool_end_eff_1stupdate;
-    virtual_visualization(1:3,4) = T_tool_end_eff_cur(1:3,4);
-    trplot(virtual_visualization, 'frame', 'V','color','r','length',0.1);
-    trplot(T_tool_end_eff_cur, 'frame', 'R','length',0.1);
-end
-
-%using the regression method to estimate the slop and intercept in the 2d
-%case
-[k,b,deltay,deltax,atan2_k,k2] = regression_2d(ct_set);
-
-if(sign(atan2_k) == 1 )
-    if((deltay>0)&&(deltax>0))
-        gama = k2+pi;
-    else
-        gama = k2;
-    end
-else
-    if((deltay>0)&&(deltax<0))
-        gama = k2+pi;
-    else
-        gama = k2;
-    end
-end
-rotate_angle = gama;
-        
+    
     %visualization of the normal direction approaching from the initial
     %guess to the real direction
-    if(mod(j,10) == 0)
+    if(mod(j,1) == 0)
         set_index = set_index + 1;
         n_hat_set(:,set_index) = n_hat;
         n_hat_distance(set_index) = dot(n_hat,T_tool_end_eff_cur(1:3,3)');
@@ -155,9 +135,13 @@ rotate_angle = gama;
         pts = [nv_start; nv_end];
 %         plot3(pts(:,1), pts(:,2), pts(:,3),'m-');
 %         hold on;  
+        %draw tool: bar+square
+        myrmexsize = 0.08;
+        color = [0.3,0.6,0.8];
+        drawsquare(T_tool_end_eff_cur,myrmexsize,color);
     end
     %update the robot joint angle
     T_tool_end_eff_old = T_tool_end_eff_cur;
     Q= Q+q_dot';
-    pause(0.1);
+    pause(0.2);
 end

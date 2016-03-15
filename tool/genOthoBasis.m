@@ -4,7 +4,7 @@
 % sponsered by DFG spp-1527: autonmous learning
 % author: Qiang Li, Bielefeld
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function v_out = genOthoBasis(v_in);
-x=v_in(:).'/norm(v_in)
+function v_out = genOthoBasis(v_in)
+x=v_in(:).'/norm(v_in);
 yz=null(x).';
 v_out=[yz;x]';  %The rows of this matrix are the axes

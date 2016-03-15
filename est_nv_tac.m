@@ -18,7 +18,7 @@
 % sponsered by DFG spp-1527: autonmous learning
 % author: Qiang Li, Bielefeld
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [n_hat, dis_set, new_tool_end_eff_frame]= est_nv_tac(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot)
+function [n_hat, dis_set, dis_set2,new_tool_end_eff_frame,n_hat_set,nv_set,tan1,tan2]= est_nv_tac(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot)
 %initialize the parameters
 P_bar = zeros(3);
 L_n = zeros(3);
@@ -28,7 +28,7 @@ gamma_n = 0.5;
 n_hat = T_tool_end_eff_init_noise(1:3,3);
 T_tool_end_eff_old = eye(4);
 n_hat_dot = zeros(3,1);
-sample_num = 350;
+sample_num = 80;
 %define index for the stored the normal direction
 set_index = 0;
 
@@ -46,21 +46,26 @@ for j =1:1:sample_num
     color = [0.3,0.6,0.8];
 %     drawtactool(T_robot_end_eff_cur,T_tool_end_eff_cur,myrmexsize,color) ;
     %update tool end-effector frame every control step
-    em = 4;%circle motion in the tangent surface;
+    em = 5;%circle motion in the tangent surface;
     if(j==1)
         T_tool_end_eff_cur_noise = T_tool_end_eff_init_noise;
     else
         T_tool_end_eff_cur_noise = new_T_tool_end_eff_noise;
     end
-    [new_tool_end_eff_frame] = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_cur_noise,em,j);
+    [new_tool_end_eff_frame noised_tool_lv_dot_local] = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_cur_noise,em,j);
+    dis_set(j) = dot(T_tool_end_eff_cur(1:3,3),T_tool_end_eff_cur_noise(1:3,3));
+    dis_set2(j) = dot(T_tool_end_eff_cur(1:3,3),n_hat);
+    nv_set(:,j) = T_tool_end_eff_cur_noise(1:3,3);
+    tan1(:,j) = T_tool_end_eff_cur_noise(1:3,1);
+    tan2(:,j) = T_tool_end_eff_cur_noise(1:3,2);
     %because the numerical error of inverse kinematics methd[new_tool_end_eff_frame is not
     %equal to the T_tool_end_eff_cur(next control step)], the distance
     %of neighbour update is computed and stored. I can be sure that
     %update_ct_surface is good because if we replace T_tool_end_eff_old
     %with new_tool_end_eff_frame, then dis = 0.(dis is the distance along 
     %the real normal direction)
-    dis = inv(T_tool_end_eff_cur)*(T_tool_end_eff_old(:,4) - T_tool_end_eff_cur(:,4));
-    dis_set(j) = dis(3);
+%     dis = inv(T_tool_end_eff_cur)*(T_tool_end_eff_old(:,4) - T_tool_end_eff_cur(:,4));
+%     dis_set(j) = dis(3);
     %estimate the linear velocity of tool, which is also the linear
     %velocity of robot end-effector, and also contact point linear velocity
     tool_lv_dot_global = new_tool_end_eff_frame(1:3,4) - T_tool_end_eff_cur(1:3,4);
@@ -89,7 +94,7 @@ for j =1:1:sample_num
     
     %visualization of the normal direction approaching from the initial
     %guess to the real direction
-    if(mod(j,10) == 0)
+    if(mod(j,1) == 0)
         set_index = set_index + 1;
         n_hat_set(:,set_index) = n_hat;
         n_hat_distance(set_index) = dot(n_hat,T_tool_end_eff_cur(1:3,3)');
@@ -115,5 +120,5 @@ for j =1:1:sample_num
     %update the robot joint angle
     T_tool_end_eff_old = T_tool_end_eff_cur;
     Q= Q+q_dot';
-    pause(0.1);
+    pause(0.2);
 end
