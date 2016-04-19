@@ -30,9 +30,13 @@ sample_num = 80;
 set_index = 0;
 old_ctc = zeros(1,2);
 exploration_scale = 0.01;
+rotation_est_ind = 1;
+rotation_est_num = 10;
+ct_R = zeros(rotation_est_num,2);
+ct_V = zeros(rotation_est_num,2);
+noised_tool_lv_dot_local_sum = zeros(3,1);
 
-for j =1:1:sample_num
-    
+for j =1:1:sample_num    
     %compute the current robot and tool configure
     T_robot_end_eff_cur = kuka_robot.fkine(Q);
     if((Flag_userobot == 1)||(j==1))
@@ -94,21 +98,25 @@ for j =1:1:sample_num
     % in oder to estimate the rotation matrix from virtual frame to the
     % real frame, more data are needed instead of only start point and end
     % point which is used for the normal direction estimation
-    sample_num = 10;
-    ct_R = zeros(sample_num,2);
-    ct_V = zeros(sample_num,2);
-    for k =1:1:sample_num
-        T_tool_intermedia_cur = eye(4);
-        T_tool_intermedia_cur(1:3,1:3) =  T_tool_end_eff_cur(1:3,1:3);
-        T_tool_intermedia_cur(1:3,4) = T_tool_end_eff_old(1:3,4) + k*(T_tool_end_eff_cur(1:3,4)-T_tool_end_eff_old(1:3,4))/sample_num;
+    % first step: collect data, est rotation matrix per $est_rotation_num data 
+    
+    if(rotation_est_ind <= rotation_est_num)
         %get the contact position in tactile sensor on the tool end-effector
-        [cx,cy] = get_tac_position(T_tool_intermedia_cur,tactile_ct);
+        [cx,cy] = get_tac_position(T_tool_end_eff_cur,tactile_ct);
         %add gaussian noise and collect 2d contact position
-        ct_R(j,1) = cx+0.001*randn;
-        ct_R(j,2) = cy+0.001*randn;
-        ct_V(j,:) = gen_tra_virualframe(j,k,exploration_scale,sample_num);
+        ct_R(rotation_est_ind,1) = cx+0.00*randn;
+        ct_R(rotation_est_ind,2) = cy+0.00*randn;
+        ct_V(rotation_est_ind,1) = (-1)*noised_tool_lv_dot_local_sum(1);
+        ct_V(rotation_est_ind,2) = (-1)*noised_tool_lv_dot_local_sum(2);
+        rotation_est_ind = rotation_est_ind + 1;
+        noised_tool_lv_dot_local_sum = noised_tool_lv_dot_local+noised_tool_lv_dot_local_sum;
+    else
+        %calculate once while data are collected
+        rotation_matrix_2d = est_rotatematrix(ct_V,ct_R)
+        n_hat
+        inv(T_tool_end_eff_cur)*new_T_tool_end_eff_noise
+        rotation_est_ind = 1;
     end
-    rotation_matrix_2d = est_rotatematrix(ct_V,ct_R);
     %draw tool: bar+square
     myrmexsize = 0.08;
     color = [0.3,0.6,0.8];

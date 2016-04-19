@@ -29,6 +29,7 @@ function endf = rotate_generate(startf,nv)
 % % hold on;
 % endf=eye(4);
 % endf(1:3,1:3) = startf(1:3,1:3) * vrrotvec2mat(axis_angle);
+endf = eye(4);
 endf(1:3,1:3) = genOthoBasis(nv);
 endf(1:3,4) = startf(1:3,4);
 % trplot(endf,'color','r');

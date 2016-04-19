@@ -59,10 +59,10 @@ drawsphere(tactile_ct(1:3),sphere_r);
 Flag_userobot = 0;
 %estimate normal direction using the initialized nv guess from the
 %approaching trajectory
-[n_hat, dis_set, dis_set2,tool_1st_end_eff_frame,n_hat_set,nv_set,tan1,tan2] = est_nv_tac(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot);
-disp('updated n_hat');
-n_hat
-n_hat = est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct)
+% [n_hat, dis_set, dis_set2,tool_1st_end_eff_frame,n_hat_set,nv_set,tan1,tan2] = est_nv_tac(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot);
+% disp('updated n_hat');
+% n_hat
+n_hat = est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct);
 
 % % estimate rotate angle from the virtual tool frame to real tool frame
 % rotate_angle = est_rotate_tac(n_hat,tool_1st_end_eff_frame,tactile_ct);
