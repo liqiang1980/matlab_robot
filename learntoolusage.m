@@ -9,7 +9,7 @@
 
 close all;
 
-%load robot model
+%load robot model and calculate the robot model kinematics
 kuka_robot = loadrobot('kukalwr');
 %visualization of kuka_lwr at the initialized pose
 Q = rand(1,7);
@@ -29,15 +29,23 @@ T_tool_end_eff_init(1:3,3)
 hold on;
 % trplot(T_tool_end_eff_init, 'frame', 'R','length',0.02,'width',0.01);
 hold on;
-%analog virtual tangent surface, assume that only the normal direction is
-%estimated and given.
-virtual_angle = 6;
-rot_tm = rpy2tr(0,0,virtual_angle,'deg');
-T_tool_end_eff_init_virtual = T_tool_end_eff_init*rot_tm;
-%analog the noised tactool frame
-virtual_x = -90+180*rand;
-virtual_y = -90+180*rand;
-virtual_z = -90+180*rand;
+
+
+%%%%%%%%%%%%%%%%%%%%%%Obsolete function%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %analog virtual tangent surface, assume that only the normal direction is
+% %estimated and given.
+% virtual_angle = 6;
+% rot_tm = rpy2tr(0,0,virtual_angle,'deg');
+% T_tool_end_eff_init_virtual = T_tool_end_eff_init*rot_tm;
+
+
+%analog the noised tactool frame, all euler angles of rotation matrix can be
+%selected from (-90deg - 90deg)
+v_low = -10;
+v_high = 10;
+virtual_x = v_low+(v_high-v_low)*rand;
+virtual_y = v_low+(v_high-v_low)*rand;
+virtual_z = v_low+(v_high-v_low)*rand;
 rot_tm = rpy2tr(virtual_x,virtual_y,virtual_z,'deg');
 T_tool_end_eff_init_noise = T_tool_end_eff_init*rot_tm;
 % trplot(T_tool_end_eff_init_noise, 'frame', 'N');
@@ -57,19 +65,30 @@ drawsphere(tactile_ct(1:3),sphere_r);
 %this is a flag to improve the visualization quality 0 is only geometry, 1
 %with robot
 Flag_userobot = 0;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%Two steps method to estimate normal direction and rotation
+%%%%%%%%%%%%%%%angle between virtual frame and real tactile sensor frame.
+% this method has been obsolete%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %estimate normal direction using the initialized nv guess from the
 %approaching trajectory
 % [n_hat, dis_set, dis_set2,tool_1st_end_eff_frame,n_hat_set,nv_set,tan1,tan2] = est_nv_tac(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot);
 % disp('updated n_hat');
 % n_hat
-n_hat = est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct);
-
 % % estimate rotate angle from the virtual tool frame to real tool frame
 % rotate_angle = est_rotate_tac(n_hat,tool_1st_end_eff_frame,tactile_ct);
 % disp('rotation angle along z is');
 % rotate_angle
-% 
-% %estimate translation from robot end-effector to tool end-effector
-% est_trans = est_translation_tac(kuka_robot,Q,tool_transform,tool_rotate,link_value);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%If we consider about the relation between the%%%
+%%%%%%%%%%%%%robot eef and tool eef as the homogeneous matrix%%%%%%%%%%%%%
+%%%following , we firstly estimate the rotation matrix, then estimate
+%%%translation.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%% one step to estimate the normal direction and rotation angle.
+n_hat = est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct);
+
+%estimate translation from robot end-effector to tool end-effector
+est_trans = est_translation_tac(kuka_robot,Q,tool_transform,tool_rotate,link_value);
 
 

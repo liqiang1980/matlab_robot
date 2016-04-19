@@ -45,7 +45,7 @@ switch em
         noised_tool_lv_dot_local(2) = 0.0002*cos(0.02*j);
         noised_tool_lv_dot_local(3) = 0;
     case 5
-        noised_tool_lv_dot_local = generate_square_shape(j,0.01);
+        noised_tool_lv_dot_local = generate_square_shape(j,0.02);
     otherwise
         disp('exploring mode 1:along x; 2: along y; 3:random; 4:circle, 5 squareshape are you planning add a new mode');
 end
