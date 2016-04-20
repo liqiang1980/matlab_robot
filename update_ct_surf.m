@@ -1,6 +1,6 @@
 % Update contact surface
 %
-% new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_cur_noise) is function to 
+% new_tool_end_eff_frame = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_cur_noise,em,j) is function to 
 % update the tactile tool frame because the noised initialized frame while
 % the sliding exploration happens.
 %
@@ -8,7 +8,8 @@
 % new_tool_end_eff_frame: updated tool frame after one step sliding
 % exploration
 % em: exploring mode. 1, sliding along x axis; 2, sliding along y axis; 3.
-% random exploring
+% random exploring; 4, circle; 5, square
+% j: index for generating square
 % See also 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,6 +1,6 @@
 % Estimate the contact frame orientation in one step
 %
-% hm = est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot) 
+% hm = est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct) 
 %
 %
 % kuka_robot: robot kinematics model
@@ -8,9 +8,11 @@
 % tool_transform: the real tool transform homogeneous matrix
 % T_tool_end_eff_init_noise: assumption noised homogeneous matrix of tool frame.
 % Flag_userobot: flag whether use robot or only geometry compuation.
+% tactile_ct: contact position in the world frame
 % See also 
 %
-%
+%[n_hat, dis_set, dis_set2,tool_1st_end_eff_frame,n_hat_set,nv_set,tan1,tan2] = est_nv_tac(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot);
+%rotate_angle = est_rotate_tac(n_hat,tool_1st_end_eff_frame,tactile_ct);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % sponsered by DFG spp-1527: autonmous learning
 % author: Qiang Li, Bielefeld
@@ -52,6 +54,7 @@ for j =1:1:sample_num
     %update tool end-effector frame every control step using different
     %exploring mode(trajectory designing)-em.
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %Todo: online update action strategy in order to learn faster.
     em = 5;%circle motion in the tangent surface;
     if(j==1)
         T_tool_end_eff_cur_noise = T_tool_end_eff_init_noise;
