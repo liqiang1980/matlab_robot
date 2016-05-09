@@ -32,8 +32,8 @@ cov = sum_xy - sum_x * mean_y;
 deltay = ps(data_set(1),2) - ps(1,2);
 deltax = ps(data_set(1),1) - ps(1,1);
 
-k2 = atan(cov / varx);
+k2 = atan(cov / varx)
 k = atan(deltay/deltax);
 b = mean_y - k * mean_x;
 
-atan2_k = atan2(deltay,deltax);
+atan2_k = atan2(deltay,deltax)

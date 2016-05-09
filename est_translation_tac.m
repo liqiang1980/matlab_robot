@@ -65,7 +65,8 @@ sample_num = 300;
         %est_trans is the translation described in the global reference
         %frame, it should be transfered to the local frame.
         est_trans = est_trans + est_trans_dot;
-        est_trans2=(T_robot_end_eff_cur(1:3,1:3) * tool_rotate(1:3,1:3))'*est_trans;
+%         est_trans2=(T_robot_end_eff_cur(1:3,1:3) * tool_rotate(1:3,1:3))'*est_trans;
+        est_trans2=(T_robot_end_eff_cur(1:3,1:3))'*est_trans;
         est(j,1:3) = est_trans2;
         est(j,4) = norm(cross(omiga_vec,est_trans2(1:3))-vel);
         
