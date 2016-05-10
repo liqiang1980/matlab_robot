@@ -88,7 +88,7 @@ Flag_userobot = 0;
 % %%%translation.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 %%%%%%%%%%% one step to estimate the normal direction and rotation angle.
-n_hat = est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct);
+% n_hat = est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct);
 
 %estimate translation from robot end-effector to tool end-effector
 est_trans = est_translation_tac(kuka_robot,Q,tool_transform,tool_rotate,link_value);

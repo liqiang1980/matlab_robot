@@ -26,14 +26,17 @@ c_r_dot = zeros(3,1);
 beta_r = 0.8;
 est_trans = zeros(3,1);
 est_trans_dot = zeros(3,1);
-sample_num = 300;
+sample_num = 500;
 
     for j =1:1:sample_num
         %get the robot current state
         T_robot_end_eff_init = kuka_robot.fkine(Q);
         %kuka_lwr generate the exploration action using its end-effector
         %rotation
-        T_robot_end_eff_cur = rotation_explore(T_robot_end_eff_init);
+%         random exploration strategy
+%         T_robot_end_eff_cur = rotation_explore(T_robot_end_eff_init);
+%       integration exploration stratgy
+        T_robot_end_eff_cur = rotation_explore_integration(T_robot_end_eff_init,j);
         T_tool_end_eff_cur = T_robot_end_eff_cur*tool_transform;
 %         trplot(T_robot_end_eff_cur, 'frame', 'C');
 %         trplot(T_tool_end_eff_cur, 'frame', 'D');
