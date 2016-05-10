@@ -15,7 +15,8 @@ kuka_robot = loadrobot('kukalwr');
 Q = rand(1,7);
 %the robot end-effector frame at the initialized status
 T_robot_end_eff_init = kuka_robot.fkine(Q);
-link_value = rand(3,1);
+% link_value = rand(3,1);
+link_value = [0.5;0.3;0.2];
 rot_value = [0.2,0.5,0.3];
 tool_rotate = trotz(rot_value(3))*troty(rot_value(2))*trotx(rot_value(1));
 tool_translate = transl(link_value);
@@ -70,8 +71,8 @@ Flag_userobot = 0;
 %%%%%%%%%%%%%%%angle between virtual frame and real tactile sensor frame.
 % this method has been obsolete%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%estimate normal direction using the initialized nv guess from the
-%approaching trajectory
+% estimate normal direction using the initialized nv guess from the
+% approaching trajectory
 % [n_hat, dis_set, dis_set2,tool_1st_end_eff_frame,n_hat_set,nv_set,tan1,tan2] = est_nv_tac(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot);
 % disp('updated n_hat');
 % n_hat
@@ -80,11 +81,11 @@ Flag_userobot = 0;
 % disp('rotation angle along z is');
 % rotate_angle
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%If we consider about the relation between the%%%
-%%%%%%%%%%%%%robot eef and tool eef as the homogeneous matrix%%%%%%%%%%%%%
-%%%following , we firstly estimate the rotation matrix, then estimate
-%%%translation.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+% %%%%%%%%%%%%%%%%%%%%%%%%%%If we consider about the relation between the%%%
+% %%%%%%%%%%%%%robot eef and tool eef as the homogeneous matrix%%%%%%%%%%%%%
+% %%%following , we firstly estimate the rotation matrix, then estimate
+% %%%translation.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
 %%%%%%%%%%% one step to estimate the normal direction and rotation angle.
 n_hat = est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct);
 

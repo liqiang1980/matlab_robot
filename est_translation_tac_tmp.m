@@ -40,9 +40,9 @@ sample_num = 300;
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%estimation alg part%%%%%%%%%%%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %%mls94 p.73 electronic version,eq. 2.53;
-        %estimate the rotation velocity in body frame
-        omiga_skmatrix = (t2r(T_robot_end_eff_cur))' * (t2r(T_robot_end_eff_cur) - t2r(T_robot_end_eff_last));
+        %%mls94 p.72 electronic version,eq. 2.53;
+        %estimate the rotation velocity
+        omiga_skmatrix = (t2r(T_robot_end_eff_cur) - t2r(T_robot_end_eff_last)) *(t2r(T_robot_end_eff_cur))';
 %         vel = (-1)*(t2r(T_end_eff_cur) - t2r(T_end_eff_last))*(t2r(T_end_eff_cur))'*...
 %             T_end_eff_cur(1:3,4) +(T_end_eff_cur(1:3,4)-T_end_eff_last(1:3,4))
         omiga_vec = [omiga_skmatrix(3,2);omiga_skmatrix(1,3);omiga_skmatrix(2,1)];
@@ -55,7 +55,7 @@ sample_num = 300;
         % compute the linear velocity from the differentiate position of the end-effector of
         % the tool. In the real world this value can not be computed, should
         % indirectly estimated from the contact information
-        vel = (t2r(T_robot_end_eff_cur))'*(T_tool_end_eff_cur(1:3,4)-T_tool_end_eff_last(1:3,4));
+        vel = (-1)*(T_tool_end_eff_cur(1:3,4)-T_tool_end_eff_last(1:3,4)+0.01*rand(3,1));
 
         L_r_dot = (-1)*beta_r*L_r-omiga_skmatrix*omiga_skmatrix;
         c_r_dot = (-1)*beta_r*c_r+omiga_skmatrix*vel;
@@ -66,9 +66,9 @@ sample_num = 300;
         %frame, it should be transfered to the local frame.
         est_trans = est_trans + est_trans_dot;
 %         est_trans2=(T_robot_end_eff_cur(1:3,1:3) * tool_rotate(1:3,1:3))'*est_trans;
-        est_trans2=est_trans;
+        est_trans2=(T_robot_end_eff_cur(1:3,1:3))'*est_trans;
         est(j,1:3) = est_trans2;
-%         est(j,4) = norm(cross(omiga_vec,est_trans2(1:3))-vel);
+        est(j,4) = norm(cross(omiga_vec,est_trans2(1:3))-vel);
         
         %update joint angle using inverse kinematics
         %from the desired linear velocity computing the joint angle rate
@@ -88,6 +88,8 @@ subplot(4,1,2);
 plot(200:sample_num,est(200:sample_num,2));
 subplot(4,1,3);
 plot(200:sample_num,est(200:sample_num,3));
+subplot(4,1,4);
+plot(200:sample_num,est(200:sample_num,4));
 disp('estimated link parameters')
 [mean(est(200:sample_num,1)),mean(est(200:sample_num,2)),mean(est(200:sample_num,3))]'
 
