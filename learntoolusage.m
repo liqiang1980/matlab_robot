@@ -15,12 +15,13 @@ kuka_robot = loadrobot('kukalwr');
 Q = rand(1,7);
 %the robot end-effector frame at the initialized status
 T_robot_end_eff_init = kuka_robot.fkine(Q);
-% link_value = rand(3,1);
-link_value = [0.5;0.3;0.2];
+link_value = rand(3,1);
 rot_value = [0.2,0.5,0.3];
 tool_rotate = trotz(rot_value(3))*troty(rot_value(2))*trotx(rot_value(1));
 tool_translate = transl(link_value);
-tool_transform = tool_rotate * tool_translate ;
+%must firstly translation then rotation, we can get the estimation of
+%translation is same with link_value
+tool_transform = tool_translate * tool_rotate;
 %the tactool end-effector frame after the transformation(translationa nd rotation
 % from the robot end-effector frame)at the initialized status
 T_tool_end_eff_init = T_robot_end_eff_init*tool_transform;

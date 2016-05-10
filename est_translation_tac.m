@@ -18,12 +18,12 @@
 function est_trans = est_translation_tac(kuka_robot,Q,tool_transform,tool_rotate,link_value)
 T_robot_end_eff_last = eye(4);
 T_tool_end_eff_last = eye(4);
-Gama_r = 30*eye(3);
+Gama_r = 15*eye(3);
 L_r = zeros(3);
 L_r_dot = zeros(3);
 c_r = zeros(3,1);
 c_r_dot = zeros(3,1);
-beta_r = 0.99;
+beta_r = 0.8;
 est_trans = zeros(3,1);
 est_trans_dot = zeros(3,1);
 sample_num = 300;
@@ -55,7 +55,7 @@ sample_num = 300;
         % compute the linear velocity from the differentiate position of the end-effector of
         % the tool. In the real world this value can not be computed, should
         % indirectly estimated from the contact information
-        vel = (t2r(T_robot_end_eff_cur))'*(T_tool_end_eff_cur(1:3,4)-T_tool_end_eff_last(1:3,4));
+        vel = (-1)*(t2r(T_robot_end_eff_cur))'*(T_tool_end_eff_cur(1:3,4)-T_tool_end_eff_last(1:3,4));
 
         L_r_dot = (-1)*beta_r*L_r-omiga_skmatrix*omiga_skmatrix;
         c_r_dot = (-1)*beta_r*c_r+omiga_skmatrix*vel;
@@ -65,7 +65,7 @@ sample_num = 300;
         %est_trans is the translation described in the global reference
         %frame, it should be transfered to the local frame.
         est_trans = est_trans + est_trans_dot;
-%         est_trans2=(T_robot_end_eff_cur(1:3,1:3) * tool_rotate(1:3,1:3))'*est_trans;
+%         est_trans2=(tool_rotate(1:3,1:3))'*est_trans;
         est_trans2=est_trans;
         est(j,1:3) = est_trans2;
 %         est(j,4) = norm(cross(omiga_vec,est_trans2(1:3))-vel);
@@ -82,12 +82,13 @@ sample_num = 300;
         T_tool_end_eff_last = T_tool_end_eff_cur;
     end
 figure(2)
+start_num = 1;
 subplot(4,1,1);
-plot(200:sample_num,est(200:sample_num,1));
+plot(start_num:sample_num,est(start_num:sample_num,1));
 subplot(4,1,2);
-plot(200:sample_num,est(200:sample_num,2));
+plot(start_num:sample_num,est(start_num:sample_num,2));
 subplot(4,1,3);
-plot(200:sample_num,est(200:sample_num,3));
+plot(start_num:sample_num,est(start_num:sample_num,3));
 disp('estimated link parameters')
 [mean(est(200:sample_num,1)),mean(est(200:sample_num,2)),mean(est(200:sample_num,3))]'
 
