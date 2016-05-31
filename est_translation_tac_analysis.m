@@ -1,6 +1,6 @@
 % Estimate the translation from robot end-effector to tool end-effector
 %
-% est_trans = est_translation(kuka_robot,Q,tool_transform,tool_rotate,link_value) is function to update
+% [est_trans, omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value) is function to update
 % the translation from the robot end-effector frame to the tool end-effector frame
 %
 % kuka_robot: robot kinematics model
@@ -15,7 +15,7 @@
 % author: Qiang Li, Bielefeld
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function est_trans= est_translation_tac(kuka_robot,Q,tool_transform,tool_rotate,link_value)
+function [est_trans, omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value)
 T_robot_end_eff_last = eye(4);
 T_tool_end_eff_last = eye(4);
 Gama_r = 2000*eye(3);
@@ -49,6 +49,7 @@ sample_num = 300;
 %         vel = (-1)*(t2r(T_end_eff_cur) - t2r(T_end_eff_last))*(t2r(T_end_eff_cur))'*...
 %             T_end_eff_cur(1:3,4) +(T_end_eff_cur(1:3,4)-T_end_eff_last(1:3,4))
         omiga_vec = [omiga_skmatrix(3,2);omiga_skmatrix(1,3);omiga_skmatrix(2,1)];
+        omiga_vec_est(j,:) = omiga_vec;
 %         rotation_rm = T_robot_end_eff_init*rotate_actx;
 %         disp('rotation axis');
 %         rotation_axis = rotation_rm(1:3,3)
@@ -61,7 +62,9 @@ sample_num = 300;
         %depends on the accuracy of the lineaer velocity 
         noise_scale = 0.002;
         vel_real = (-1)*(t2r(T_robot_end_eff_cur))'*(T_tool_end_eff_cur(1:3,4)-T_tool_end_eff_last(1:3,4));
+        vel_real_est(j,:) = vel_real;
         vel = (-1)*(t2r(T_robot_end_eff_cur))'*(T_tool_end_eff_cur(1:3,4)-T_tool_end_eff_last(1:3,4)+noise_scale*randn(3,1));
+        vel_est(j,:) = vel;
         L_r_dot = (-1)*beta_r*L_r-omiga_skmatrix*omiga_skmatrix;
         c_r_dot = (-1)*beta_r*c_r+omiga_skmatrix*vel;
         est_trans_dot = (-1)*Gama_r*(L_r*est_trans-c_r);

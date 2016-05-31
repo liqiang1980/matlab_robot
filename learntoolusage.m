@@ -91,6 +91,6 @@ Flag_userobot = 0;
 % n_hat = est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct);
 
 %estimate translation from robot end-effector to tool end-effector
-est_trans = est_translation_tac(kuka_robot,Q,tool_transform,tool_rotate,link_value);
-
+% est_trans = est_translation_tac(kuka_robot,Q,tool_transform,tool_rotate,link_value);
+[est_trans, omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value);
 
