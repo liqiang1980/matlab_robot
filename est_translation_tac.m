@@ -26,7 +26,7 @@ c_r_dot = zeros(3,1);
 beta_r = 0.99;
 est_trans = zeros(3,1);
 est_trans_dot = zeros(3,1);
-sample_num = 300;
+sample_num = 500;
 
     for j =1:1:sample_num
         %get the robot current state
@@ -97,13 +97,13 @@ plot(start_num:sample_num,est(start_num:sample_num,3));
 disp('estimated link parameters')
 [mean(est(200:sample_num,1)),mean(est(200:sample_num,2)),mean(est(200:sample_num,3))]'
 
-figure(3);
-subplot(3,1,1);
-plot(1:sample_num,omiga_vec_est(1:sample_num,1));
-subplot(3,1,2);
-plot(1:sample_num,omiga_vec_est(1:sample_num,2));
-subplot(3,1,3);
-plot(1:sample_num,omiga_vec_est(1:sample_num,3));
+% figure(3);
+% subplot(3,1,1);
+% plot(1:sample_num,omiga_vec_est(1:sample_num,1));
+% subplot(3,1,2);
+% plot(1:sample_num,omiga_vec_est(1:sample_num,2));
+% subplot(3,1,3);
+% plot(1:sample_num,omiga_vec_est(1:sample_num,3));
 
 disp('real link parameters')
 link_value
