@@ -40,7 +40,13 @@ hold on;
 % rot_tm = rpy2tr(0,0,virtual_angle,'deg');
 % T_tool_end_eff_init_virtual = T_tool_end_eff_init*rot_tm;
 
+stochastic_num = 50;
+n_hat_dis = zeros(stochastic_num,1);
 
+
+for i = 1:stochastic_num
+    disp('times is: ');
+    i
 %analog the noised tactool frame, all euler angles of rotation matrix can be
 %selected from (-90deg - 90deg)
 v_low = -40;
@@ -88,10 +94,12 @@ Flag_userobot = 0;
 % %%%translation.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 %%%%%%%%%%% one step to estimate the normal direction and rotation angle.
-% [n_hat n_hat_set]= est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct);
-
+[n_hat n_hat_set]= est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct)
+disp('distance is in this time');
+n_hat_dis(i,1) = norm(n_hat-T_tool_end_eff_init(1:3,3),2)
 %estimate translation from robot end-effector to tool end-effector
 % est_trans = est_translation_tac(kuka_robot,Q,tool_transform,tool_rotate,link_value);
-[est_trans, omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value);
-vis_learn_process(est_trans, omiga_vec_est, vel_real_est, vel_est,link_value);
+% [est_trans, omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value);
+% vis_learn_process(est_trans, omiga_vec_est, vel_real_est, vel_est,link_value);
 
+end

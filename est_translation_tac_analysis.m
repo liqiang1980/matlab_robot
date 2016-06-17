@@ -15,7 +15,7 @@
 % author: Qiang Li, Bielefeld
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [est_trans, omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value)
+function [est, omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value)
 T_robot_end_eff_last = eye(4);
 T_tool_end_eff_last = eye(4);
 Gama_r = 2000*eye(3);
@@ -26,7 +26,7 @@ c_r_dot = zeros(3,1);
 beta_r = 0.99;
 est_trans = zeros(3,1);
 est_trans_dot = zeros(3,1);
-sample_num = 300;
+sample_num = 700;
 
     for j =1:1:sample_num
         %get the robot current state
@@ -60,7 +60,7 @@ sample_num = 300;
         % indirectly estimated from the contact information
         %from the simulaiton, the accuracy of translation estimation
         %depends on the accuracy of the lineaer velocity 
-        noise_scale = 0.002;
+        noise_scale = 0.00;
         vel_real = (-1)*(t2r(T_robot_end_eff_cur))'*(T_tool_end_eff_cur(1:3,4)-T_tool_end_eff_last(1:3,4));
         vel_real_est(j,:) = vel_real;
         vel = (-1)*(t2r(T_robot_end_eff_cur))'*(T_tool_end_eff_cur(1:3,4)-T_tool_end_eff_last(1:3,4)+noise_scale*randn(3,1));
@@ -97,8 +97,6 @@ subplot(4,1,2);
 plot(start_num:sample_num,est(start_num:sample_num,2));
 subplot(4,1,3);
 plot(start_num:sample_num,est(start_num:sample_num,3));
-disp('estimated link parameters')
-[mean(est(200:sample_num,1)),mean(est(200:sample_num,2)),mean(est(200:sample_num,3))]'
 
 figure(3);
 subplot(3,1,1);
@@ -107,9 +105,7 @@ subplot(3,1,2);
 plot(1:sample_num,omiga_vec_est(1:sample_num,2));
 subplot(3,1,3);
 plot(1:sample_num,omiga_vec_est(1:sample_num,3));
-
-disp('real link parameters')
-link_value
+end
 
 
 

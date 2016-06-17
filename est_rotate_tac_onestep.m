@@ -17,7 +17,7 @@
 % sponsered by DFG spp-1527: autonmous learning
 % author: Qiang Li, Bielefeld
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function n_hat = est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct)
+function [n_hat n_hat_set]= est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct)
 %initialize the parameters
 P_bar = zeros(3);
 L_n = zeros(3);
@@ -35,6 +35,8 @@ rotation_est_num = 4;
 ct_R = zeros(rotation_est_num,2);
 ct_V = zeros(rotation_est_num,2);
 noised_tool_lv_dot_local_sum = zeros(3,1);
+
+n_hat_set = zeros(3,sample_num);
 
 %incrementally learn orientation matrix of tool
 for j =1:1:sample_num    
@@ -90,7 +92,7 @@ for j =1:1:sample_num
     n_hat = n_hat+n_hat_dot;
     n_hat = n_hat/norm(n_hat);
     L_n = L_n + L_n_dot;
-    
+    n_hat_set(:,j) = n_hat;
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%from the current estimated normal direction to update the estimated%
     %%sensor frame%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -114,9 +116,9 @@ for j =1:1:sample_num
         noised_tool_lv_dot_local_sum = noised_tool_lv_dot_local+noised_tool_lv_dot_local_sum;
     else
         %calculate once while data are collected
-        rotation_matrix_2d = est_rotatematrix(ct_V,ct_R)
-        n_hat
-        inv(T_tool_end_eff_cur)*new_T_tool_end_eff_noise
+        rotation_matrix_2d = est_rotatematrix(ct_V,ct_R);
+%         n_hat
+%         inv(T_tool_end_eff_cur)*new_T_tool_end_eff_noise
         rotation_est_ind = 1;
     end
 
@@ -127,18 +129,18 @@ for j =1:1:sample_num
         est_nv_start = T_tool_end_eff_cur(1:3,4)';
         est_nv_end = est_nv_start+n_hat';
         pts = [est_nv_start; est_nv_end];
-        plot3(pts(:,1), pts(:,2), pts(:,3),'g-');
+%         plot3(pts(:,1), pts(:,2), pts(:,3),'g-');
         hold on;
         %real normal direction
         nv_start = T_tool_end_eff_cur(1:3,4)';
         nv_end = nv_start+T_tool_end_eff_cur(1:3,3)';
         pts = [nv_start; nv_end];
-        plot3(pts(:,1), pts(:,2), pts(:,3),'m-');
+%         plot3(pts(:,1), pts(:,2), pts(:,3),'m-');
         hold on;  
         %draw tool: bar+square
         myrmexsize = 0.08;
         color = [0.3,0.6,0.8];
-        drawsquare(T_tool_end_eff_cur,myrmexsize,color);
+%         drawsquare(T_tool_end_eff_cur,myrmexsize,color);
     end
     %update the robot joint angle
     Q= Q+q_dot';
