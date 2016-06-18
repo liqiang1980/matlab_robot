@@ -92,11 +92,7 @@ Flag_userobot = 0;
 
 %estimate translation from robot end-effector to tool end-effector
 % est_trans = est_translation_tac(kuka_robot,Q,tool_transform,tool_rotate,link_value);
-<<<<<<< HEAD
 [est_trans, omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value);
 vis_learn_process(est_trans, omiga_vec_est, vel_real_est, vel_est,link_value);
-=======
-[est_trans, est, omiga_vec_real, omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value);
 est_trans_alg();
->>>>>>> 2df4213727a6a11426549ef499adb7af0a5bde44
 
