@@ -18,13 +18,13 @@
 function [est_trans, est, omiga_vec_real,omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value)
 T_robot_end_eff_last = eye(4);
 T_tool_end_eff_last = eye(4);
-Gama_r = 2000*eye(3);
+Gama_r = 500*eye(3);
 L_r = zeros(3);
 L_r_dot = zeros(3);
 c_r = zeros(3,1);
 c_r_dot = zeros(3,1);
-beta_r = 0.99;
-est_trans = zeros(3,1);
+beta_r = 0.9;
+est_trans = rand(3,1);
 est_trans_dot = zeros(3,1);
 sample_num = 700;
 
@@ -48,7 +48,7 @@ sample_num = 700;
         omiga_skmatrix_real = (t2r(T_robot_end_eff_cur))' * (t2r(T_robot_end_eff_cur) - t2r(T_robot_end_eff_last));
 %         vel = (-1)*(t2r(T_end_eff_cur) - t2r(T_end_eff_last))*(t2r(T_end_eff_cur))'*...
 %             T_end_eff_cur(1:3,4) +(T_end_eff_cur(1:3,4)-T_end_eff_last(1:3,4))
-        noise_omiga = 0.001;
+        noise_omiga = 0.00;
         omiga_vec_real(j,:) = [omiga_skmatrix_real(3,2);omiga_skmatrix_real(1,3);omiga_skmatrix_real(2,1)];
         omiga_vec = [omiga_skmatrix_real(3,2);omiga_skmatrix_real(1,3);omiga_skmatrix_real(2,1)]+noise_omiga*randn(3,1);
         omiga_skmatrix_est = vec2skew(omiga_vec);
@@ -68,8 +68,8 @@ sample_num = 700;
         vel_real_est(j,:) = vel_real;
         vel = (-1)*(t2r(T_robot_end_eff_cur))'*(T_tool_end_eff_cur(1:3,4)-T_tool_end_eff_last(1:3,4)+noise_scale*randn(3,1));
         vel_est(j,:) = vel;
-        L_r_dot = (-1)*beta_r*L_r-omiga_skmatrix_est*omiga_skmatrix_est;
-        c_r_dot = (-1)*beta_r*c_r+omiga_skmatrix_est*vel;
+        L_r_dot = (-1)*beta_r*L_r-omiga_skmatrix_real*omiga_skmatrix_real;
+        c_r_dot = (-1)*beta_r*c_r+omiga_skmatrix_real*vel;
         est_trans_dot = (-1)*Gama_r*(L_r*est_trans-c_r);
         L_r = L_r + L_r_dot;
         c_r = c_r + c_r_dot;

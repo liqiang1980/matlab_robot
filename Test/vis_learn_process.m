@@ -1,16 +1,16 @@
-function vis_learn_process(est_trans, omiga_vec_est, vel_real_est, vel_est,real_link)
+function vis_learn_process(est, omiga_vec_est, vel_real_est, vel_est,real_link)
 len = 700;
 disp('est link value');
-est_link = est_trans(end,:)
+est_link = est(end,:)
 disp('real link value');
 real_link
 figure(4);
 subplot(3,1,1);
-plot(est_trans(160:len,1));
+plot(est(160:len,1));
 subplot(3,1,2);
-plot(est_trans(160:len,2));
+plot(est(160:len,2));
 subplot(3,1,3);
-plot(est_trans(160:len,3));
+plot(est(160:len,3));
 title('estimation convergency curve');
 
 A = omiga_vec_est;
