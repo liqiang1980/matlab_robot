@@ -67,6 +67,7 @@ sphere_r = 0.005;
 %this is a flag to improve the visualization quality 0 is only geometry, 1
 %with robot
 Flag_userobot = 0;
+len = 3000;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%Two steps method to estimate normal direction and rotation
 %%%%%%%%%%%%%%%angle between virtual frame and real tactile sensor frame.
@@ -92,9 +93,9 @@ Flag_userobot = 0;
 
 %estimate translation from robot end-effector to tool end-effector
 % est_trans = est_translation_tac(kuka_robot,Q,tool_transform,tool_rotate,link_value);
-[est_trans, est, omiga_vec_real, omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value);
+[est_trans, est, omiga_vec_real, omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value,len);
 % est_trans_alg();
-vis_learn_process(est, omiga_vec_est, vel_real_est, vel_est,link_value);
+vis_learn_process(est, omiga_vec_est, vel_real_est, vel_est,link_value,len);
 
 
 

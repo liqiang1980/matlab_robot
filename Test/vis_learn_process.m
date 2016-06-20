@@ -1,5 +1,4 @@
-function vis_learn_process(est, omiga_vec_est, vel_real_est, vel_est,real_link)
-len = 700;
+function vis_learn_process(est, omiga_vec_est, vel_real_est, vel_est,real_link,len)
 disp('est link value');
 est_link = est(end,:)
 disp('real link value');

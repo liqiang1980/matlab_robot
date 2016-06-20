@@ -15,10 +15,10 @@
 % author: Qiang Li, Bielefeld
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [est_trans, est, omiga_vec_real,omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value)
+function [est_trans, est, omiga_vec_real,omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value,sample_num)
 T_robot_end_eff_last = eye(4);
 T_tool_end_eff_last = eye(4);
-Gama_r = 500*eye(3);
+Gama_r = 2000*eye(3);
 L_r = zeros(3);
 L_r_dot = zeros(3);
 c_r = zeros(3,1);
@@ -26,7 +26,6 @@ c_r_dot = zeros(3,1);
 beta_r = 0.9;
 est_trans = rand(3,1);
 est_trans_dot = zeros(3,1);
-sample_num = 700;
 
     for j =1:1:sample_num
         %get the robot current state
@@ -36,7 +35,7 @@ sample_num = 700;
 %         random exploration strategy
 %         T_robot_end_eff_cur = rotation_explore(T_robot_end_eff_init);
 %       integration exploration stratgy
-        T_robot_end_eff_cur = rotation_explore_sin(T_robot_end_eff_init,j);
+        T_robot_end_eff_cur = rotation_explore_cos_withz(T_robot_end_eff_init,j);
         T_tool_end_eff_cur = T_robot_end_eff_cur*tool_transform;
 %         trplot(T_robot_end_eff_cur, 'frame', 'C');
 %         trplot(T_tool_end_eff_cur, 'frame', 'D');
