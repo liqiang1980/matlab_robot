@@ -25,8 +25,8 @@ tool_transform = tool_translate * tool_rotate;
 %the tactool end-effector frame after the transformation(translationa nd rotation
 % from the robot end-effector frame)at the initialized status
 T_tool_end_eff_init = T_robot_end_eff_init*tool_transform;
-% disp('real n_hat');
-% T_tool_end_eff_init(1:3,3)
+disp('real n_hat');
+T_tool_end_eff_init(1:3,3)
 % kuka_robot.plot(Q,'workspace',[-3, 3 -3, 3 -3, 3]);
 hold on;
 % trplot(T_tool_end_eff_init, 'frame', 'R','length',0.02,'width',0.01);
@@ -67,7 +67,7 @@ sphere_r = 0.005;
 %this is a flag to improve the visualization quality 0 is only geometry, 1
 %with robot
 Flag_userobot = 0;
-len = 1000;
+len = 80;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%Two steps method to estimate normal direction and rotation
 %%%%%%%%%%%%%%%angle between virtual frame and real tactile sensor frame.
@@ -89,13 +89,13 @@ len = 1000;
 % %%%translation.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 %%%%%%%%%%% one step to estimate the normal direction and rotation angle.
-% [n_hat n_hat_set]= est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct);
+[n_hat n_hat_set]= est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct);
 
 %estimate translation from robot end-effector to tool end-effector
 % est_trans = est_translation_tac(kuka_robot,Q,tool_transform,tool_rotate,link_value);
-[est_trans, est, omiga_vec_real, omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value,len);
-% est_trans_alg();
-vis_learn_process(est, omiga_vec_est, vel_real_est, vel_est,link_value,len);
+% [est_trans, est, omiga_vec_real, omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value,len);
+% % est_trans_alg();
+% vis_learn_process(est, omiga_vec_est, vel_real_est, vel_est,link_value,len);
 
 
 

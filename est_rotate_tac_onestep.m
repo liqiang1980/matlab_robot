@@ -66,7 +66,7 @@ for j =1:1:sample_num
     [new_tool_end_eff_frame noised_tool_lv_dot_local] = update_ct_surf(T_tool_end_eff_cur,T_tool_end_eff_cur_noise,em,j);
     %estimate the linear velocity of tool, which is also the linear
     %velocity of robot end-effector, and also contact point linear velocity
-    tool_lv_dot_global = new_tool_end_eff_frame(1:3,4) - T_tool_end_eff_cur(1:3,4);
+    tool_lv_dot_global = new_tool_end_eff_frame(1:3,4) - T_tool_end_eff_cur(1:3,4) + 0.001*randn(3,1);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%instant inverse kinematics%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

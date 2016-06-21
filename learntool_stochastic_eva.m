@@ -40,13 +40,8 @@ hold on;
 % rot_tm = rpy2tr(0,0,virtual_angle,'deg');
 % T_tool_end_eff_init_virtual = T_tool_end_eff_init*rot_tm;
 
-stochastic_num = 50;
+stochastic_num = 20;
 n_hat_dis = zeros(stochastic_num,1);
-
-
-for i = 1:stochastic_num
-    disp('times is: ');
-    i
 %analog the noised tactool frame, all euler angles of rotation matrix can be
 %selected from (-90deg - 90deg)
 v_low = -40;
@@ -59,6 +54,14 @@ T_tool_end_eff_init_noise = T_tool_end_eff_init*rot_tm;
 % trplot(T_tool_end_eff_init_noise, 'frame', 'N');
 disp('noised n_hat');
 T_tool_end_eff_init_noise(1:3,3)
+
+n_hat_set_set = zeros(3,80,stochastic_num);
+mean_dev_val = zeros(3,stochastic_num);
+std_val = zeros(3,stochastic_num);
+
+for i = 1:stochastic_num
+    disp('times is: ');
+    i
 
 %draw contact ball
 % cx = -0.04 + 0.08*rand; %initialized contact point in the local x
@@ -94,9 +97,14 @@ Flag_userobot = 0;
 % %%%translation.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 %%%%%%%%%%% one step to estimate the normal direction and rotation angle.
-[n_hat n_hat_set]= est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct)
-disp('distance is in this time');
-n_hat_dis(i,1) = norm(n_hat-T_tool_end_eff_init(1:3,3),2)
+[n_hat, n_hat_set]= est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct);
+n_hat_set_set(:,:,i) = n_hat_set;
+mean_dev_val(1,i) = T_tool_end_eff_init(1,3)-mean(n_hat_set(1,40:80));
+mean_dev_val(2,i) = T_tool_end_eff_init(2,3)-mean(n_hat_set(2,40:80));
+mean_dev_val(3,i) = T_tool_end_eff_init(3,3)-mean(n_hat_set(3,40:80));
+std_val(1,i) = std(n_hat_set(1,40:80));
+std_val(2,i) = std(n_hat_set(2,40:80));
+std_val(3,i) = std(n_hat_set(3,40:80));
 %estimate translation from robot end-effector to tool end-effector
 % est_trans = est_translation_tac(kuka_robot,Q,tool_transform,tool_rotate,link_value);
 % [est_trans, omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value);

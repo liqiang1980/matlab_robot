@@ -68,7 +68,7 @@ for j =1:1:sample_num
 %     dis_set(j) = dis(3);
     %estimate the linear velocity of tool, which is also the linear
     %velocity of robot end-effector, and also contact point linear velocity
-    tool_lv_dot_global = new_tool_end_eff_frame(1:3,4) - T_tool_end_eff_cur(1:3,4);
+    tool_lv_dot_global = new_tool_end_eff_frame(1:3,4) - T_tool_end_eff_cur(1:3,4) + 0.00*randn(3,1);
     %from the desired linear velocity computing the joint angle rate
     Jac = kuka_robot.jacob0(Q);
     %using the psudo inverse is not good idea here because the jitter

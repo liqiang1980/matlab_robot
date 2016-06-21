@@ -3,14 +3,21 @@ disp('est link value');
 est_link = est(end,:)
 disp('real link value');
 real_link
+mat_real_link = repmat(real_link,1,len) ;
 figure(4);
-subplot(3,1,1);
-plot(est(160:len,1));
-subplot(3,1,2);
-plot(est(160:len,2));
-subplot(3,1,3);
-plot(est(160:len,3));
 title('estimation convergency curve');
+subplot(3,1,1);
+plot(est(1:len,1)-mat_real_link(1,1:len)');
+ylabel('x');
+grid on;
+subplot(3,1,2);
+plot(est(1:len,2)-mat_real_link(2,1:len)');
+ylabel('y');grid on;
+subplot(3,1,3);
+plot(est(1:len,3)-mat_real_link(3,1:len)');
+xlabel('iterative(rotate) times');
+ylabel('z');
+grid on;
 
 A = omiga_vec_est;
 r1 = est_link;  
