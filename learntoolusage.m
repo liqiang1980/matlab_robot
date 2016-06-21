@@ -67,7 +67,7 @@ sphere_r = 0.005;
 %this is a flag to improve the visualization quality 0 is only geometry, 1
 %with robot
 Flag_userobot = 0;
-len = 3000;
+len = 1000;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%Two steps method to estimate normal direction and rotation
 %%%%%%%%%%%%%%%angle between virtual frame and real tactile sensor frame.

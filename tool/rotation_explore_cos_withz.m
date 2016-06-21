@@ -23,6 +23,9 @@ if((mod(ind,6*HALFPI)<2*HALFPI)&&(mod(ind,6*HALFPI)>=0))
 rotate_actx = r2t(rotx(cos(pi/2+1/100*mod(ind,6*HALFPI))*scale));
 rotate_acty = eye(4);
 rotate_actz = eye(4);
+rotate_actx;
+ind;
+rpy = tr2rpy(rotate_actz*rotate_acty*rotate_actx)
 end
 % if((mod(ind,6*HALFPI)<2*HALFPI)&&(mod(ind,6*HALFPI)>=HALFPI))
 % rotate_actx = r2t(rotx(cos(pi/2+1/100*(mod(ind,2*HALFPI)))*scale));
@@ -36,6 +39,8 @@ if((mod(ind,6*HALFPI)<4*HALFPI)&&(mod(ind,6*HALFPI)>=2*HALFPI))
 rotate_actx = eye(4);
 rotate_acty = r2t(roty(cos(pi/2+1/100*(mod(ind,6*HALFPI)-2*HALFPI))*scale));
 rotate_actz = eye(4);
+rotate_acty
+ind
 end
 % if((mod(ind,6*HALFPI)<=4*HALFPI)&&(mod(ind,6*HALFPI)>=3*HALFPI))
 % rotate_actx = eye(4);
