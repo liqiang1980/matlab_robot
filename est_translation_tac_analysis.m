@@ -65,7 +65,7 @@ est_trans_dot = zeros(3,1);
         % indirectly estimated from the contact information
         %from the simulaiton, the accuracy of translation estimation
         %depends on the accuracy of the lineaer velocity 
-        noise_scale = 0.00;
+        noise_scale = 0.001;
         vel_real = (-1)*(t2r(T_robot_end_eff_cur))'*(T_tool_end_eff_cur(1:3,4)-T_tool_end_eff_last(1:3,4));
         vel_real_est(j,:) = vel_real;
         vel = (-1)*(t2r(T_robot_end_eff_cur))'*(T_tool_end_eff_cur(1:3,4)-T_tool_end_eff_last(1:3,4)+noise_scale*randn(3,1));

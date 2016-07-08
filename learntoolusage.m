@@ -16,6 +16,9 @@ Q = rand(1,7);
 %the robot end-effector frame at the initialized status
 T_robot_end_eff_init = kuka_robot.fkine(Q);
 link_value = rand(3,1)
+link_value(1) = 0.3;
+link_value(2) = 0.5;
+link_value(3) = 0.9;
 rot_value = [0.2,0.5,0.3];
 tool_rotate = trotz(rot_value(3))*troty(rot_value(2))*trotx(rot_value(1));
 tool_translate = transl(link_value);
@@ -89,13 +92,13 @@ len = 80;
 % %%%translation.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 %%%%%%%%%%% one step to estimate the normal direction and rotation angle.
-[n_hat n_hat_set]= est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct);
+% [n_hat n_hat_set]= est_rotate_tac_onestep(kuka_robot,Q,tool_transform,T_tool_end_eff_init_noise,Flag_userobot,tactile_ct);
 
 %estimate translation from robot end-effector to tool end-effector
 % est_trans = est_translation_tac(kuka_robot,Q,tool_transform,tool_rotate,link_value);
-% [est_trans, est, omiga_vec_real, omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value,len);
-% % est_trans_alg();
-% vis_learn_process(est, omiga_vec_est, vel_real_est, vel_est,link_value,len);
+[est_trans, est, omiga_vec_real, omiga_vec_est, vel_real_est, vel_est]= est_translation_tac_analysis(kuka_robot,Q,tool_transform,tool_rotate,link_value,len);
+% est_trans_alg();
+vis_learn_process(est, omiga_vec_est, vel_real_est, vel_est,link_value,len);
 
 
 
